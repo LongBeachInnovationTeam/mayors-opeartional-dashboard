@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CLB Dashboard</title>
+  <link rel="stylesheet" href="./static/lib/css//bootstrap.min.css">
+  <link rel="stylesheet" href="./static/lib/css/keen-dashboards.css">
+  <link rel="stylesheet" href="./static/css/chart_styles.css">
+  <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+</head>
+<body class="application">
+
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="./">
+          <img src="./static/images/long_beach_logo_white.png" width="140" height="30">
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Request Topics For This Month
+          </div>
+          <div class="chart-stage">
+            <canvas id="go-lb-topics" class="chart"></canvas>
+          </div>
+          <div class="chart-notes">
+            Topic distribution for this month displayed by percentage.
+          </div>
+        </div>
+      </div>
+      <!-- Map -->
+      <div class="col-sm-6">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            GO Long Beach Requests &mdash; Intensity Map
+          </div>
+          <div class="chart-stage">
+            <div id="go-lb-map-canvas" class="chart"></div>
+          </div>
+          <div class="chart-notes">
+            Displaying <strong>Graffiti</strong> and
+            <strong>Illegally dumped item</strong> requests that took over
+            <strong>10 DAYS</strong> to resolve within the past 6 months.
+          </div>
+        </div>
+      </div>
+      <!-- Map -->
+    </div>
+
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Duplicate Requests By Location and Topic
+          </div>
+          <div class="chart-stage chart">
+            <table id="duplicate-requests-table" class="table table-condensed">
+              <thead>
+                <tr>
+                  <th>Location</th>
+                  <th>Topic</th>
+                  <th>Requests</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for l in multiple_locations %}
+                  <tr>
+                    <td>{{ l.location }}</td>
+                    <td>{{ l.topic }}</td>
+                    <td>{{ l.topic_count }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="chart-notes">
+            Table displaying the <strong>Top 10 locations</strong>
+            that have duplicate <strong>Opened</strong>
+            and <strong>Pending</strong> requests.
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Requests Distribution
+          </div>
+          <div class="chart-stage">
+            <canvas id="go-lb-rolling-requests" class="chart"></canvas>
+          </div>
+          <div class="chart-notes">
+            YTD progress on <strong>Open</strong> and <strong>Closed</strong>
+            requests.
+          </div>
+        </div>
+      </div>
+    </div><!--.row-->
+
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Open Requests
+          </div>
+          <div class="chart-stage">
+            <div id="open-requests-metric" class="metric-text text-center">
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-3">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Pending Requests
+          </div>
+          <div class="chart-stage">
+            <div id="pending-requests-metric" class="metric-text text-center">
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-3">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Closed Requests YTD
+          </div>
+          <div class="chart-stage">
+            <div id="closed-requests-metric" class="metric-text text-center">
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-3">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Average Number of Days to Close Request
+          </div>
+          <div class="chart-stage">
+            <div id="avg-days-to-close-metric" class="metric-text text-center">
+              <span></span> Days
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!--.row-->
+
+  </div><!--.container-->
+
+  <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+  <script>
+    // get the viz.json url from the CartoDB Editor
+    // - click on visualize
+    // - create new visualization
+    // - make visualization public
+    // - click on publish
+    // - go to API tab
+    window.onload = function () {
+      cartodb.createVis('go-lb-map-canvas', 'https://alchave.cartodb.com/api/v2/viz/226e9248-8780-11e5-bc45-0ea31932ec1d/viz.json');
+    }
+  </script>
+
+  <script src="./static/lib/js/jquery.min.js"></script>
+  <script src="./static/lib/js/underscore-min.js"></script>
+  <script src="./static/lib/js/bootstrap.min.js"></script>
+  <script src="./static/lib/js/Chart.min.js"></script>
+  <script src="./static/lib/js/Chart.HorizontalBar.js"></script>
+  <script src="./static/lib/js/d3.js"></script>
+  <script src="./static/lib/js/queue.js"></script>
+  <script src="./static/lib/js/keen.min.js"></script>
+  <script src='./static/js/graphs.js' type='text/javascript'></script>
+</body>
+</html>
