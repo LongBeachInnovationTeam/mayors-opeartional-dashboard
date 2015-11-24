@@ -1,7 +1,7 @@
 queue()
-  .defer(d3.json, "/data/go_lb/topics")
-  .defer(d3.json, "/data/go_lb/measures")
-  .defer(d3.json, "/data/go_lb/status_ytd")
+  .defer(d3.json, "data/go_lb/topics")
+  .defer(d3.json, "data/go_lb/measures")
+  .defer(d3.json, "data/go_lb/status_ytd")
   .await(makeGraphs);
 
 function getMonthName(d) {
