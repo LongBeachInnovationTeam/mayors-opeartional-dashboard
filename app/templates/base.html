@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CLB Dashboard</title>
+  <link rel="stylesheet" href="./static/lib/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./static/lib/css/keen-dashboards.css">
+  <link rel="stylesheet" href="./static/css/chart_styles.css">
+  <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+</head>
+<body class="application">
+
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="./">
+          <img src="./static/images/long_beach_logo_white.png" width="140" height="30">
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    {% block content %}{% endblock %}
+  </div><!--.container-->
+
+  <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+  <script>
+    // get the viz.json url from the CartoDB Editor
+    // - click on visualize
+    // - create new visualization
+    // - make visualization public
+    // - click on publish
+    // - go to API tab
+    window.onload = function () {
+      cartodb.createVis('go-lb-map-canvas', 'https://alchave.cartodb.com/api/v2/viz/226e9248-8780-11e5-bc45-0ea31932ec1d/viz.json');
+    }
+  </script>
+
+  <script src="./static/lib/js/jquery.min.js"></script>
+  <script src="./static/lib/js/underscore-min.js"></script>
+  <script src="./static/lib/js/bootstrap.min.js"></script>
+  <script src="./static/lib/js/Chart.min.js"></script>
+  <script src="./static/lib/js/Chart.HorizontalBar.js"></script>
+  <script src="./static/lib/js/d3.js"></script>
+  <script src="./static/lib/js/queue.js"></script>
+  <script src="./static/js/graphs.js"></script>
+</body>
+</html>

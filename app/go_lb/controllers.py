@@ -6,14 +6,13 @@ db = Database()
 
 go_lb = Blueprint('go_lb', __name__, url_prefix='/')
 
-# TO-DO: Re-factor with date_handler for database module
+# TO-DO: Re-factor with date_handler from the database module
 date_handler = lambda obj: (
   obj.isoformat()
   if isinstance(obj, datetime.datetime)
   or isinstance(obj, datetime.date)
   else None
 )
-
 
 @go_lb.route('/')
 def index():
