@@ -4,7 +4,7 @@ import json
 
 db = Database()
 
-go_lb = Blueprint('go_lb', __name__, url_prefix='/')
+go_lb = Blueprint('go_lb', __name__)
 
 # TO-DO: Re-factor with date_handler from the database module
 date_handler = lambda obj: (
@@ -29,7 +29,7 @@ def index():
   result = db.sql_to_dict(sql)
   return render_template('go_lb/index.html', multiple_locations=result)
 
-@go_lb.route('data/go_lb/last_updated')
+@go_lb.route('/data/go_lb/last_updated')
 def go_lb_last_updated():
   sql = """
     SELECT MAX(GREATEST(entered_date, date_closed, date_last_updated))
@@ -38,7 +38,7 @@ def go_lb_last_updated():
   last_updated = db.sql_to_value(sql)
   return json.dumps(last_updated, default=date_handler)
 
-@go_lb.route('data/go_lb/measures')
+@go_lb.route('/data/go_lb/measures')
 def go_lb_avg_days_to_close():
 
   # Compute the total number of requests
@@ -90,7 +90,7 @@ def go_lb_avg_days_to_close():
 
   return json.dumps(measures)
 
-@go_lb.route('data/go_lb/departments')
+@go_lb.route('/data/go_lb/departments')
 def go_lb_departments():
   sql = """
     SELECT 		department, COUNT(request) AS count
@@ -101,7 +101,7 @@ def go_lb_departments():
   """
   return db.sql_to_json(sql)
 
-@go_lb.route('data/go_lb/topics')
+@go_lb.route('/data/go_lb/topics')
 def go_lb_topics():
   sql = """
     SELECT 		topic, COUNT(request) AS count
@@ -112,7 +112,7 @@ def go_lb_topics():
   """
   return db.sql_to_json(sql)
 
-@go_lb.route('data/go_lb/map')
+@go_lb.route('/data/go_lb/map')
 def go_lb_map():
   sql = """
     SELECT	request
@@ -124,7 +124,7 @@ def go_lb_map():
   """
   return db.sql_to_json(sql)
 
-@go_lb.route('data/go_lb/repeat_requests')
+@go_lb.route('/data/go_lb/repeat_requests')
 def go_lb_repeat_requests():
   sql = """
     SELECT      location
@@ -137,7 +137,7 @@ def go_lb_repeat_requests():
   """
   return db.sql_to_dict(sql)
 
-@go_lb.route('data/go_lb/status_ytd')
+@go_lb.route('/data/go_lb/status_ytd')
 def go_lb_status_ytd():
   sql = """
     SELECT      status
