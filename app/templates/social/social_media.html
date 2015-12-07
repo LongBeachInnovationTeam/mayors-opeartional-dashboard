@@ -1,24 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="row">
-  <div class="col-sm-6">
-    <h1>Social Media Dashboard</h1>
+  <div class="col-sm-3">
+
   </div>
 </div>
 
+
 <div class="row">
-	<div class="col-sm-6">
-		<ul>
-			{% for p in top_facebook_posts %}
-				<li>{{ top_facebook_posts[p]['message'] }}</li>
-				<li>
-					Likes: {{ top_facebook_posts[p]['likes'] }} |
-					Comments: {{ top_facebook_posts[p]['comments'] }} |
-					Shares: {{ top_facebook_posts[p]['shares'] }}
-				</li>
-			{% endfor %}
-		</ul>
-	</div>
+  <div class="col-sm-4">
+    <div class="chart-wrapper">
+      <div class="chart-title">
+        Top Facebook Posts
+      </div>
+      <div class="chart-stage">
+				<ul class="list-group">
+					{% for p in top_facebook_posts %}
+						<li class="list-group-item">
+								{{ top_facebook_posts[p]['message'] }}
+						</li>
+						<li class="fb-post-stats">
+							Likes: {{ top_facebook_posts[p]['likes'] }} |
+							Comments: {{ top_facebook_posts[p]['comments'] }} |
+							Shares: {{ top_facebook_posts[p]['shares'] }}
+						</li>
+					{% endfor %}
+				</ul>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

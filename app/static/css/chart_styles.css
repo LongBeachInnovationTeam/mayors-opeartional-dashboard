@@ -16,3 +16,18 @@
 	font-weight: 600;
 	font-size: 36px;
 }
+
+/* Other styles */
+.social-panel-title {
+	font-size: 24px;
+}
+
+.fb-post-stats {
+  position: relative;
+  display: block;
+  padding: 5px 15px;
+  margin-bottom: -1px;
+  color: #fff;
+  background-color: #0A324C;
+  border: 1px solid #ddd;
+}

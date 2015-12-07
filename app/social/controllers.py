@@ -6,25 +6,57 @@ import collections
 
 social = Blueprint('social', __name__)
 
-FB_ACCESS_TOKEN = '470735709779695|qgN3i_WmdasalQYkfa5yOHt7VuQ'
-FB_DATA_URL = 'https://graph.facebook.com/v2.5/iteamlb?fields=insights,posts%7Bid%2Cshares%2Clikes%2Ccomments%2Cmessage%2Ctype%7D&access_token=' + FB_ACCESS_TOKEN
+FB_ACCESS_TOKEN = 'CAACEdEose0cBAC4JxAf9Dy4ZAZBRNTElkwaiPakxaZAN78EeYKJZBR7AkLV6T8lNv2N2JzeFRq7sEhEKGfGxGGNvFfmjTQIcmJ7yy4lCznA929Gb9sMWLaWRAVVEqqxHAX2JZAsWSjbYMpT4ZCBUQKpTVtxGQhpyUMlZAay3r3mSNZBiaUFYjC38ZCOSYz4TqvpBIh2ZAknUZBY4fvLybJQYRLZC'
+FB_DATA_URL = 'https://graph.facebook.com/v2.5/iteamlb?fields=insights,posts%7Bid%2Cmessage%2Ctype%2Cinsights%7D&access_token=' + FB_ACCESS_TOKEN
 
-def get_top_posts():
+def get_page_stats(insights_data):
+	page_stats = {}
+	for i in range(0, len(insights_data)):
+		metric = insights_data[i]
+		if metric['name'] == 'page_posts_impressions_unique' and metric['period'] == 'days_28':
+			page_stats['posts_impressions_unique'] = metric['values']
+		if metric['name'] == 'page_impressions_by_story_type_unique' and metric['period'] == 'days_28':
+			page_stats['impressions_by_story_type_unique'] = metric['values']
+		if metric['name'] == 'page_impressions_by_age_gender_unique' and metric['period'] == 'days_28':
+			page_stats['impressions_by_age_gender_unique'] = metric['values']
+		if metric['name'] == 'page_impressions_by_city_unique' and metric['period'] == 'days_28':
+			page_stats['impressions_by_city_unique'] = metric['values']
+		if metric['name'] == 'page_fans' and metric['period'] == 'lifetime':
+			page_stats['fans'] = metric['values']
+	return page_stats
 
-	# Fetch response from HTTP request
-	r = requests.get(FB_DATA_URL)
-	posts_json = r.json()
-	posts_data = posts_json['posts']['data']
+def get_top_posts(posts_data):
 
 	top_posts = {}
 	for i in range(0, len(posts_data)):
+
+		# Get post and insights data from response
 		post = posts_data[i]
+		insights_data = post['insights']['data']
 
 		# Instantiate default attributes that might not be defined for a post
 		message = ''
+		unique_impressions = 0
+		engaged_users = 0
 		shares = 0
 		likes = 0
 		comments = 0
+
+		for i in insights_data:
+			if i['name'] == 'post_story_adds_by_action_type':
+				values = i['values']
+				post_values = values[0]['value']
+				if 'like' in post_values:
+					likes = post_values['like']
+				if 'comment' in post_values:
+					comments = post_values['comment']
+				if 'share' in post_values:
+					shares = post_values['share']
+			if i['name'] == 'post_impressions_unique':
+				values = i['values']
+				unique_impressions = values[0]['value']
+			if i['name'] == 'engaged_users':
+				engaged_users = values[0]['value']
 
 		# Get attributes for a post
 		post_id = post['id']
@@ -32,28 +64,24 @@ def get_top_posts():
 
 		if 'message' in post:
 			message = post['message']
-		if 'shares' in post:
-			shares = int(post['shares']['count'])
-		if 'likes' in post:
-			likes = int(len(post['likes']['data']))
-		if 'comments' in post:
-			comments = int(len(post['comments']['data']))
+			message = message[0:130] + '...'
 
 		# Add post and its attributes to our dictionary
 		top_posts[post_id] = {
 			'post_type': post_type,
 			'message': message,
+			'unique_impressions': unique_impressions,
+			'engaged_users': engaged_users,
 			'shares': shares,
 			'likes': likes,
-			'comments': comments,
-			'popularity_score': shares + likes + comments
+			'comments': comments
 		}
 
-	# Order posts by popularity_score
+	# Order posts by unique_impressions
 	ordered_top_posts = collections.OrderedDict(
 		sorted(
 			top_posts.items(),
-			key=lambda t: t[1]['popularity_score'],
+			key=lambda t: t[1]['unique_impressions'],
 			reverse=True
 		)
 	)
@@ -62,16 +90,14 @@ def get_top_posts():
 
 @social.route('/social')
 def index():
-	top_posts = get_top_posts()
 
-	print top_posts
+	# Fetch Facebook data from their API
+	r = requests.get(FB_DATA_URL)
+	fb_json = r.json()
+	fb_posts_data = fb_json['posts']['data']
+	fb_insights_data = fb_json['insights']['data']
 
-	# r = requests.get(FB_INSIGHTS_URL)
-	# insights_json = r.json()
-	# insights_data = insights_json['insights']['data']
-	# for index in range(0, len(insights_data)):
-	# 	metric_name = insights_data[index]['name']
-	# 	if metric_name == 'page_impressions_by_story_type':
-	# 		print insights_data[index]
+	top_posts = get_top_posts(fb_posts_data)
+	page_stats = get_page_stats(fb_insights_data)
 
 	return render_template('social/social_media.html', top_facebook_posts=top_posts)
