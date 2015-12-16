@@ -1,7 +1,6 @@
 queue()
   .defer(d3.json, "data/go_lb/topics")
   .defer(d3.json, "data/go_lb/measures")
-  .defer(d3.json, "data/go_lb/status_ytd")
   .await(makeGraphs);
 
 function getMonthName(d) {
@@ -11,35 +10,6 @@ function getMonthName(d) {
 	var d = new Date(d);
 	return monthNames[d.getMonth()];
 }
-
-// var cells = [
-// 	'go-lb-topics',
-// 	'go-lb-map-canvas',
-// 	'go-lb-rolling-requests',
-// 	'duplicate-requests-table'
-// ];
-
-// function getTallestCellHeight() {
-// 	var tallestHeight = 0;
-// 	cells.forEach(function(c) {
-// 		var h = $("#" + c).height();
-// 		if (h > tallestHeight) {
-// 			tallestHeight = h;
-// 		}
-// 	});
-// 	return tallestHeight;
-// }
-
-// function resizeCells() {
-// 	var h = getTallestCellHeight();
-// 	$(".chart-stage").height(h);
-
-// 	//$("#go-lb-topics").height(h - 20);
-// 	$("#go-lb-topics").css({
-// 		'margin-top': '50px'
-// 	});
-
-// }
 
 function makeGoLBTopicsChart(data) {
 
@@ -60,10 +30,10 @@ function makeGoLBTopicsChart(data) {
     datasets: [
       {
         label: "Topics Distribution",
-        fillColor: "rgba(23,185,217,1)",
-        strokeColor: "rgba(23,185,217,0.8)",
-        highlightFill: "rgba(23,185,217,0.75)",
-        highlightStroke: "rgba(23,185,217,1)",
+        fillColor: "#1ca8dd",
+        strokeColor: "rgba(28,168,221,0.8)",
+        highlightFill: "rgba(28,168,221,0.5)",
+        highlightStroke: "rgba(28,168,221,1)",
         data: topicPercentageValues
       }
     ]
@@ -144,26 +114,100 @@ function makeGoLBStatusGraph(goLBStatus) {
 
 } // END makeGoLBStatusGraph
 
-function populateMeasures(measures) {
+function populateMeasures(data) {
+
+	var measures = data.measures;
+	var measuresChartData = data.measures_charts;
+
 	var openRequests = measures.openRequests[0].toLocaleString();
-	$("#open-requests-metric span").text(openRequests);
+	$("#open-requests-metric").text(openRequests);
 
 	var pendingRequests = measures.pendingRequests[0].toLocaleString();
-	$("#pending-requests-metric span").text(pendingRequests);
+	$("#pending-requests-metric").text(pendingRequests);
 
 	var closedRequests = measures.closedRequests[0].toLocaleString();
-	$("#closed-requests-metric span").text(closedRequests);
+	$("#closed-requests-metric").text(closedRequests);
 
 	var avgDaysToClose = measures.avgDaysToClose[0].toLocaleString();
-	$("#avg-days-to-close-metric span").text(avgDaysToClose);
+	$("#avg-days-to-close-metric").text(avgDaysToClose);
+
+	// Options apply to all of our sparklines
+  var sparklineOptions = {
+    animation: false,
+    responsive: true,
+    bezierCurve : true,
+    bezierCurveTension : 0.25,
+    showScale: false,
+    pointDotRadius: 0,
+    pointDotStrokeWidth: 0,
+    pointDot: false,
+    showTooltips: false
+  };
+
+  var chartData = {
+    labels   : _.pluck(measuresChartData.openRequests, 'reporting_month'),
+    datasets : [
+    	{
+    		fillColor:'rgba(28,168,221,.03)',
+    		strokeColor: '#1ca8dd',
+    		pointStrokeColor: '#fff',
+    		data: _.pluck(measuresChartData.openRequests, 'request_count')
+    	}
+    ]
+  };
+	var ctx = document.getElementById("open-requests-sparkline").getContext("2d");
+	var chart = new Chart(ctx).Line(chartData, sparklineOptions);
+
+  var chartData = {
+    labels   : _.pluck(measuresChartData.pendingRequests, 'reporting_month'),
+    datasets : [
+    	{
+    		fillColor:'rgba(28,168,221,.03)',
+    		strokeColor: '#1ca8dd',
+    		pointStrokeColor: '#fff',
+    		data: _.pluck(measuresChartData.pendingRequests, 'request_count')
+    	}
+    ]
+  };
+	var ctx = document.getElementById("pending-requests-sparkline").getContext("2d");
+	var chart = new Chart(ctx).Line(chartData, sparklineOptions);
+
+  var chartData = {
+    labels   : _.pluck(measuresChartData.closedRequests, 'reporting_month'),
+    datasets : [
+    	{
+    		fillColor:'rgba(28,168,221,.03)',
+    		strokeColor: '#1ca8dd',
+    		pointStrokeColor: '#fff',
+    		data: _.pluck(measuresChartData.closedRequests, 'request_count')
+    	}
+    ]
+  };
+	var ctx = document.getElementById("closed-requests-sparkline").getContext("2d");
+	var chart = new Chart(ctx).Line(chartData, sparklineOptions);
+
+  var chartData = {
+    labels   : _.pluck(measuresChartData.averageRequests, 'reporting_month'),
+    datasets : [
+    	{
+    		fillColor:'rgba(28,168,221,.03)',
+    		strokeColor: '#1ca8dd',
+    		pointStrokeColor: '#fff',
+    		data: _.pluck(measuresChartData.averageRequests, 'avg_days_to_close')
+    	}
+    ]
+  };
+	var ctx = document.getElementById("average-requests-sparkline").getContext("2d");
+	var chart = new Chart(ctx).Line(chartData, sparklineOptions);
+
 }
 
-function makeGraphs(error, goLBTopics, measures, goLBStatus) {
-	Chart.defaults.global.responsive = true;
-	Chart.defaults.global.maintainAspectRatio = false;
+function makeGraphs(error, topicsData, statsData) {
+	// Chart.defaults.global.responsive = true;
+	// Chart.defaults.global.maintainAspectRatio = false;
+	Chart.defaults.global.scaleLineColor = "#a9aebd";
+	Chart.defaults.global.scaleFontColor = "#a9aebd";
 
-	makeGoLBTopicsChart(goLBTopics);
-	populateMeasures(measures);
-	makeGoLBStatusGraph(goLBStatus);
-	resizeCells();
+	makeGoLBTopicsChart(topicsData);
+	populateMeasures(statsData);
 };

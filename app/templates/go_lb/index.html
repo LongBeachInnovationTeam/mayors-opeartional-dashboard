@@ -1,142 +1,140 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="row">
-  <div class="col-sm-6">
-    <div class="chart-wrapper">
-      <div class="chart-title">
-        Request Topic Distribution For This Month
+<div class="dashhead m-t-md">
+  <div class="dashhead-titles">
+    <h6 class="dashhead-subtitle">Dashboards</h6>
+    <h2 class="dashhead-title">GO Long Beach</h2>
+  </div>
+</div>
+
+<div class="hr-divider m-t m-b-md">
+  <h3 class="hr-divider-content hr-divider-heading">YTD stats</h3>
+</div>
+
+<div class="row statcards">
+  <div class="col-sm-6 col-md-3 m-b">
+    <div class="statcard">
+      <div class="p-a">
+        <span class="statcard-desc">Open Requests</span>
+        <h2 class="statcard-number">
+          <span id="open-requests-metric"></span>
+        </h2>
       </div>
-      <div class="chart-stage">
-        <canvas id="go-lb-topics" class="chart"></canvas>
+      <canvas id="open-requests-sparkline" width="378" height="94" class="sparkline" style="width: 189px; height: 47px;"></canvas>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-3 m-b">
+    <div class="statcard">
+      <div class="p-a">
+        <span class="statcard-desc">Pending Requests</span>
+        <h2 class="statcard-number">
+          <span id="pending-requests-metric"></span>
+        </h2>
       </div>
-      <div class="chart-notes">
-        Topic distribution for this month displayed by percentage.
+      <canvas id="pending-requests-sparkline" width="378" height="94" class="sparkline" style="width: 189px; height: 47px;"></canvas>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-3 m-b">
+    <div class="statcard">
+      <div class="p-a">
+        <span class="statcard-desc">Closed Requests</span>
+        <h2 class="statcard-number">
+          <span id="closed-requests-metric"></span>
+        </h2>
+      </div>
+      <canvas id="closed-requests-sparkline" width="378" height="94" class="sparkline" style="width: 189px; height: 47px;"></canvas>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-3 m-b">
+    <div class="statcard">
+      <div class="p-a">
+        <span class="statcard-desc">Average Time To Close Request</span>
+        <h2 class="statcard-number">
+          <span id="avg-days-to-close-metric"></span> Days
+          <small class="label label-success">5%</small>
+        </h2>
+      </div>
+      <canvas id="average-requests-sparkline" width="378" height="94" class="sparkline" style="width: 189px; height: 47px;"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="hr-divider m-y-md">
+  <ul class="nav nav-pills hr-divider-content hr-divider-nav" role="tablist">
+    <li class="active" role="presentation">
+      <a href="#topics" role="tab" data-toggle="tab" aria-controls="topics">Topics</a>
+    </li>
+    <li role="presentation">
+      <a href="#locations" role="tab" data-toggle="tab" aria-controls="locations">Locations</a>
+    </li>
+    <li role="presentation">
+      <a href="#requests" role="tab" data-toggle="tab" aria-controls="requests">Requests</a>
+    </li>
+  </ul>
+</div>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="topics">
+    <div class="col-md-6">
+      <h4>Reported topic distribution for this month</h4>
+      <canvas id="go-lb-topics" class="chart"></canvas>
+    </div>
+    <div class="col-md-6">
+      <div class="list-group">
+
+        <h4 class="list-group-header">
+          Request distribution by department
+        </h4>
+
+        <a class="list-group-item" href="#">
+          <span class="list-group-progress" style="width: 62.4%;"></span>
+          <span class="pull-right text-muted">62.4%</span>
+          Public Works
+        </a>
+
       </div>
     </div>
   </div>
-
-  <!-- Map -->
-  <div class="col-sm-6">
-    <div class="chart-wrapper">
-      <div class="chart-title">
-        GO Long Beach Requests &mdash; Intensity Map
-      </div>
-      <div class="chart-stage">
-        <div id="go-lb-map-canvas" class="chart"></div>
-      </div>
+  <div role="tabpanel" class="tab-pane" id="locations">
+    <div class="col-md-6">
+      <h4>GO Long Beach Requests &mdash; Intensity Map</h4>
+      <div id="go-lb-map-canvas" class="chart"></div>
       <div class="chart-notes">
         Displaying <strong>Graffiti</strong> and
         <strong>Illegally dumped item</strong> requests that took over
         <strong>10 DAYS</strong> to resolve within the past 6 months.
       </div>
     </div>
+    <div class="col-md-6">
+      <h4>Duplicate Requests By Location and Topic</h4>
+      <table id="duplicate-requests-table" class="table table-condensed">
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>Topic</th>
+            <th>Requests</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in multiple_locations %}
+            <tr>
+              <td>{{ l.location }}</td>
+              <td>{{ l.topic }}</td>
+              <td>{{ l.topic_count }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
-  <!-- Map -->
+
+  <div role="tabpanel" class="tab-pane" id="requests">
+    <div class="col-md-6">
+      Content goes here...
+    </div>
+  </div>
+
 </div>
 
-<div class="row">
-  <div class="col-sm-6">
-    <div class="chart-wrapper">
-      <div class="chart-title">
-        Duplicate Requests By Location and Topic
-      </div>
-      <div class="chart-stage chart">
-        <table id="duplicate-requests-table" class="table table-condensed">
-          <thead>
-            <tr>
-              <th>Location</th>
-              <th>Topic</th>
-              <th>Requests</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for l in multiple_locations %}
-              <tr>
-                <td>{{ l.location }}</td>
-                <td>{{ l.topic }}</td>
-                <td>{{ l.topic_count }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      <div class="chart-notes">
-        Table displaying the <strong>Top 10 locations</strong>
-        that have duplicate <strong>Opened</strong>
-        and <strong>Pending</strong> requests.
-      </div>
-    </div>
-  </div>
-
-  <div class="col-sm-6">
-    <div class="chart-wrapper">
-      <div class="chart-title">
-        Requests Distribution
-      </div>
-      <div class="chart-stage">
-        <canvas id="go-lb-rolling-requests" class="chart"></canvas>
-      </div>
-      <div class="chart-notes">
-        YTD progress on <strong>Open</strong> and <strong>Closed</strong>
-        requests.
-      </div>
-    </div>
-  </div>
-</div><!--.row-->
-
-<div class="row">
-  <div class="col-sm-3">
-    <div class="chart-wrapper">
-      <div class="chart-title">
-        Open Requests
-      </div>
-      <div class="chart-stage">
-        <div id="open-requests-metric" class="metric-text text-center">
-          <span></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-sm-3">
-    <div class="chart-wrapper">
-      <div class="chart-title">
-        Pending Requests
-      </div>
-      <div class="chart-stage">
-        <div id="pending-requests-metric" class="metric-text text-center">
-          <span></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-sm-3">
-    <div class="chart-wrapper">
-      <div class="chart-title">
-        Closed Requests YTD
-      </div>
-      <div class="chart-stage">
-        <div id="closed-requests-metric" class="metric-text text-center">
-          <span></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-sm-3">
-    <div class="chart-wrapper">
-      <div class="chart-title">
-        Average Number of Days to Close Request
-      </div>
-      <div class="chart-stage">
-        <div id="avg-days-to-close-metric" class="metric-text text-center">
-          <span></span> Days
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!--.row-->
 {% endblock %}

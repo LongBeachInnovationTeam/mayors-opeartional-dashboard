@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 from app.database.model import Database
-import json
+import collections, datetime, json
 
 db = Database()
 
@@ -38,8 +38,19 @@ def go_lb_last_updated():
   last_updated = db.sql_to_value(sql)
   return json.dumps(last_updated, default=date_handler)
 
+@go_lb.route('/data/go_lb/topics')
+def go_lb_topics():
+  sql = """
+    SELECT    topic, COUNT(request) AS count
+    FROM      go_long_beach
+    WHERE     entered_date BETWEEN '2015-10-01' AND '2015-10-31'
+    GROUP BY  topic
+    ORDER BY  count ASC;
+  """
+  return db.sql_to_json(sql)
+
 @go_lb.route('/data/go_lb/measures')
-def go_lb_avg_days_to_close():
+def go_lb_measures():
 
   # Compute the total number of requests
   sql = """
@@ -79,7 +90,47 @@ def go_lb_avg_days_to_close():
   """
   avg_days_to_close = db.sql_to_value(sql)
 
+  sql = """
+    SELECT    date_trunc('month', entered_date) AS reporting_month
+              ,COUNT(*) AS request_count
+    FROM      go_long_beach
+    WHERE     status = 'Open'
+    GROUP BY  status, reporting_month
+    ORDER BY  reporting_month;
+  """
+  open_requests_ytd = db.sql_to_dict(sql)
+
+  sql = """
+    SELECT    date_trunc('month', entered_date) AS reporting_month
+              ,COUNT(*) AS request_count
+    FROM      go_long_beach
+    WHERE     status = 'Pending'
+    GROUP BY  status, reporting_month
+    ORDER BY  reporting_month;
+  """
+  pending_requests_ytd = db.sql_to_dict(sql)
+
+  sql = """
+    SELECT    date_trunc('month', entered_date) AS reporting_month
+              ,COUNT(*) AS request_count
+    FROM      go_long_beach
+    WHERE     status = 'Closed'
+    GROUP BY  status, reporting_month
+    ORDER BY  reporting_month;
+  """
+  closed_requests_ytd = db.sql_to_dict(sql)
+
+  sql = """
+    SELECT    date_trunc('month', entered_date) AS reporting_month
+              ,ROUND(AVG(date_closed - entered_date)::numeric, 2) AS avg_days_to_close
+    FROM      go_long_beach
+    GROUP BY  reporting_month
+    ORDER BY  reporting_month;
+  """
+  average_requests_close_ytd = db.sql_to_dict(sql)
+
   # Create a dictionary of measures to return to the users
+  # This populates the stat cards (numbers)
   measures = {
     'avgDaysToClose': avg_days_to_close,
     'totalRequests': requests_count,
@@ -88,7 +139,24 @@ def go_lb_avg_days_to_close():
     'closedRequests': closed_requests_count
   }
 
-  return json.dumps(measures)
+  # Data will be used to render the sparkline chart
+  # under each measure
+  measures_charts = {
+    'openRequests': open_requests_ytd,
+    'pendingRequests': pending_requests_ytd,
+    'closedRequests': closed_requests_ytd,
+    'averageRequests': average_requests_close_ytd
+  }
+
+  # This will be converted into the JSON
+  # document that the client will consumer
+  # via XHR or AJAX request
+  result = {
+    'measures': measures,
+    'measures_charts': measures_charts
+  }
+
+  return json.dumps(result, default=date_handler)
 
 @go_lb.route('/data/go_lb/departments')
 def go_lb_departments():
@@ -98,17 +166,6 @@ def go_lb_departments():
     WHERE			entered_date BETWEEN '2015-10-01' AND '2015-10-31'
     GROUP BY	department
     ORDER BY	count DESC;
-  """
-  return db.sql_to_json(sql)
-
-@go_lb.route('/data/go_lb/topics')
-def go_lb_topics():
-  sql = """
-    SELECT 		topic, COUNT(request) AS count
-    FROM 			go_long_beach
-    WHERE 		entered_date BETWEEN '2015-10-01' AND '2015-10-31'
-    GROUP BY 	topic
-    ORDER BY	count ASC;
   """
   return db.sql_to_json(sql)
 
@@ -136,15 +193,3 @@ def go_lb_repeat_requests():
     ORDER BY    topic_count DESC;
   """
   return db.sql_to_dict(sql)
-
-@go_lb.route('/data/go_lb/status_ytd')
-def go_lb_status_ytd():
-  sql = """
-    SELECT      status
-                ,COUNT(*) AS record_count
-                ,date_trunc('month', entered_date) AS reporting_date
-    FROM        go_long_beach
-    WHERE       status = 'Open' or status = 'Closed'
-    GROUP BY    status, date_trunc('month', entered_date);
-  """
-  return db.sql_to_json(sql)
