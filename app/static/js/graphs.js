@@ -11,7 +11,7 @@ function getMonthName(d) {
 	return monthNames[d.getMonth()];
 }
 
-function makeGoLBTopicsChart(data) {
+function renderTopicsChart(data) {
 
 	// Pluck values
 	var topics = _.pluck(data, 'topic');
@@ -48,88 +48,12 @@ function makeGoLBTopicsChart(data) {
 
 }
 
-function makeGoLBStatusGraph(goLBStatus) {
+function renderStatCardValue(elemId, measure, data) {
+	var t = data[measure][0].toLocaleString();
+	$(elemId).text(t);
+}
 
-	// Get a unique array of reporting dates
-	var reportingDates = _.uniq(_.pluck(goLBStatus, 'reporting_date'));
-
-	// Sort reporting dates
-	reportingDates.sort(function(a, b) {
-	  // Turn your strings into dates, and then subtract them
-	  // to get a value that is either negative, positive, or zero.
-	  return new Date(a) - new Date(b);
-	});
-
-	var monthNames = [];
-	reportingDates.forEach(function (d) {
-		monthNames.push(getMonthName(d));
-	});
-
-	var openRequests = [];
-	var closedRequests = [];
-
-	goLBStatus.forEach(function (r) {
-		switch(r.status) {
-			case 'Open':
-				openRequests.push(r.record_count);
-				break;
-			case 'Closed':
-				closedRequests.push(r.record_count);
-				break;
-		}
-	});
-
-	var chartData = {
-	  labels: monthNames,
-	  datasets: [
-      {
-        label: "Open",
-        fillColor: "rgba(23,185,217,0.2)",
-        strokeColor: "rgba(23,185,217,1.0)",
-        pointColor: "rgba(23,185,217,1.0)",
-        pointStrokeColor: "#fff",
-        pointHighlightFill: "#fff",
-        pointHighlightStroke: "rgba(23,185,217,1.0)",
-        data: openRequests
-      },
-      {
-        label: "Closed",
-        fillColor: "rgba(10,50,76,0.2)",
-        strokeColor: "rgba(10,50,76,1.0)",
-        pointColor: "rgba(10,50,76,1.0)",
-        pointStrokeColor: "#fff",
-        pointHighlightFill: "#fff",
-        pointHighlightStroke: "rgba(10,50,76,1.0)",
-        data: closedRequests
-      }
-	  ]
-	};
-
-	var ctx = document.getElementById("go-lb-rolling-requests").getContext("2d");
-	var chart = new Chart(ctx).Line(chartData, {
-	  bezierCurve : false,
-	  datasetFill : false,
-		scaleShowGridLines : false,
-	});
-
-} // END makeGoLBStatusGraph
-
-function populateMeasures(data) {
-
-	var measures = data.measures;
-	var measuresChartData = data.measures_charts;
-
-	var openRequests = measures.openRequests[0].toLocaleString();
-	$("#open-requests-metric").text(openRequests);
-
-	var pendingRequests = measures.pendingRequests[0].toLocaleString();
-	$("#pending-requests-metric").text(pendingRequests);
-
-	var closedRequests = measures.closedRequests[0].toLocaleString();
-	$("#closed-requests-metric").text(closedRequests);
-
-	var avgDaysToClose = measures.avgDaysToClose[0].toLocaleString();
-	$("#avg-days-to-close-metric").text(avgDaysToClose);
+function renderStatCardSparkline(elemId, measure, labelName, valueName, data) {
 
 	// Options apply to all of our sparklines
   var sparklineOptions = {
@@ -144,61 +68,41 @@ function populateMeasures(data) {
     showTooltips: false
   };
 
+  // Prepare chart data
   var chartData = {
-    labels   : _.pluck(measuresChartData.openRequests, 'reporting_month'),
+    labels   : _.pluck(data[measure], labelName),
     datasets : [
     	{
     		fillColor:'rgba(28,168,221,.03)',
     		strokeColor: '#1ca8dd',
     		pointStrokeColor: '#fff',
-    		data: _.pluck(measuresChartData.openRequests, 'request_count')
+    		data: _.pluck(data[measure], valueName)
     	}
     ]
   };
-	var ctx = document.getElementById("open-requests-sparkline").getContext("2d");
+
+  // Get canvas context and render sparkline chart
+	var ctx = document.getElementById(elemId).getContext("2d");
 	var chart = new Chart(ctx).Line(chartData, sparklineOptions);
 
-  var chartData = {
-    labels   : _.pluck(measuresChartData.pendingRequests, 'reporting_month'),
-    datasets : [
-    	{
-    		fillColor:'rgba(28,168,221,.03)',
-    		strokeColor: '#1ca8dd',
-    		pointStrokeColor: '#fff',
-    		data: _.pluck(measuresChartData.pendingRequests, 'request_count')
-    	}
-    ]
-  };
-	var ctx = document.getElementById("pending-requests-sparkline").getContext("2d");
-	var chart = new Chart(ctx).Line(chartData, sparklineOptions);
+}
 
-  var chartData = {
-    labels   : _.pluck(measuresChartData.closedRequests, 'reporting_month'),
-    datasets : [
-    	{
-    		fillColor:'rgba(28,168,221,.03)',
-    		strokeColor: '#1ca8dd',
-    		pointStrokeColor: '#fff',
-    		data: _.pluck(measuresChartData.closedRequests, 'request_count')
-    	}
-    ]
-  };
-	var ctx = document.getElementById("closed-requests-sparkline").getContext("2d");
-	var chart = new Chart(ctx).Line(chartData, sparklineOptions);
+function renderStatCards(data) {
 
-  var chartData = {
-    labels   : _.pluck(measuresChartData.averageRequests, 'reporting_month'),
-    datasets : [
-    	{
-    		fillColor:'rgba(28,168,221,.03)',
-    		strokeColor: '#1ca8dd',
-    		pointStrokeColor: '#fff',
-    		data: _.pluck(measuresChartData.averageRequests, 'avg_days_to_close')
-    	}
-    ]
-  };
-	var ctx = document.getElementById("average-requests-sparkline").getContext("2d");
-	var chart = new Chart(ctx).Line(chartData, sparklineOptions);
+	var measures = data.measures;
+	var measuresChartData = data.measures_charts;
+
+	// Populate numbers
+	renderStatCardValue("#open-requests-metric", "openRequests", measures);
+	renderStatCardValue("#pending-requests-metric", "pendingRequests", measures);
+	renderStatCardValue("#closed-requests-metric", "closedRequests", measures);
+	renderStatCardValue("#avg-days-to-close-metric", "avgDaysToClose", measures);
+
+	// Render sparklines
+	renderStatCardSparkline("open-requests-sparkline", "openRequests", "reporting_month", "request_count", measuresChartData);
+	renderStatCardSparkline("pending-requests-sparkline", "pendingRequests", "reporting_month", "request_count", measuresChartData);
+	renderStatCardSparkline("closed-requests-sparkline", "closedRequests", "reporting_month", "request_count", measuresChartData);
+	renderStatCardSparkline("average-requests-sparkline", "averageRequests", "reporting_month", "avg_days_to_close", measuresChartData);
 
 }
 
@@ -208,6 +112,6 @@ function makeGraphs(error, topicsData, statsData) {
 	Chart.defaults.global.scaleLineColor = "#a9aebd";
 	Chart.defaults.global.scaleFontColor = "#a9aebd";
 
-	makeGoLBTopicsChart(topicsData);
-	populateMeasures(statsData);
+	renderTopicsChart(topicsData);
+	renderStatCards(statsData);
 };
