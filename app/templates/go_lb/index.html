@@ -6,6 +6,13 @@
     <h6 class="dashhead-subtitle">Dashboards</h6>
     <h2 class="dashhead-title">GO Long Beach</h2>
   </div>
+  <div class="dashhead-toolbar">
+    <div class="btn-group dashhead-toolbar-item btn-group-thirds">
+      <button type="button" class="btn btn-primary-outline disabled">Day</button>
+      <button type="button" class="btn btn-primary-outline disabled">Week</button>
+      <button type="button" class="btn btn-primary-outline active">Month</button>
+    </div>
+  </div>
 </div>
 
 <div class="hr-divider m-t m-b-md">
@@ -51,8 +58,7 @@
       <div class="p-a">
         <span class="statcard-desc">Average Time To Close Request</span>
         <h2 class="statcard-number">
-          <span id="avg-days-to-close-metric"></span> Days
-          <small class="label label-success">5%</small>
+          <span id="avg-days-to-close-metric"></span> days
         </h2>
       </div>
       <canvas id="average-requests-sparkline" class="sparkline"></canvas>
@@ -100,11 +106,12 @@
     <div class="col-md-6">
       <h4>GO Long Beach Requests &mdash; Intensity Map</h4>
       <div id="go-lb-map-canvas"></div>
-      <div class="chart-notes">
+      <p>
+        <br />
         Displaying <strong>Graffiti</strong> and
         <strong>Illegally dumped item</strong> requests that took over
         <strong>10 DAYS</strong> to resolve within the past 6 months.
-      </div>
+      </p>
     </div>
     <div class="col-md-6">
       <h4>Duplicate Requests By Location and Topic</h4>

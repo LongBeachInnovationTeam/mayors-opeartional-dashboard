@@ -18,11 +18,11 @@ function renderTopicsChart(data) {
 	var topicCountValues = _.pluck(data, 'count');
 
 	// Convert counts into percentages
-	var total = _.reduce(topicCountValues, function(memo, num) { return memo + num; }, 0);
-	var topicPercentageValues = [];
-	topicCountValues.forEach(function(t) {
-		topicPercentageValues.push((t / total) * 100);
-	});
+	// var total = _.reduce(topicCountValues, function(memo, num) { return memo + num; }, 0);
+	// var topicPercentageValues = [];
+	// topicCountValues.forEach(function(t) {
+	// 	topicPercentageValues.push((t / total) * 100);
+	// });
 
 	// Prepare chart data format
 	var chartData = {
@@ -34,7 +34,7 @@ function renderTopicsChart(data) {
         strokeColor: "rgba(28,168,221,0.8)",
         highlightFill: "rgba(28,168,221,0.5)",
         highlightStroke: "rgba(28,168,221,1)",
-        data: topicPercentageValues
+        data: topicCountValues
       }
     ]
 	}
