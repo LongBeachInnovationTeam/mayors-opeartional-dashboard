@@ -1,20 +1,12 @@
-.chart {
+.sparkline {
+	width: 190px;
+	height: 50px;
+}
+
+#go-lb-map-canvas {
 	min-height: 325px;
 	max-height: 325px;
 	height: 325px;
-}
-
-#go-lb-topics {
-	padding-right: 20px;
-}
-
-#go-lb-rolling-requests {
-	padding-right: 20px;
-}
-
-.metric-text {
-	font-weight: 600;
-	font-size: 36px;
 }
 
 /* Other styles */

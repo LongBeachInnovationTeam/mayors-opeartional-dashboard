@@ -42,8 +42,12 @@ function renderTopicsChart(data) {
 	// Render chart
 	var ctx = document.getElementById("go-lb-topics").getContext("2d");
 	var chart = new Chart(ctx).HorizontalBar(chartData, {
+		animation: false,
 		barValueSpacing : 1,
-		scaleShowGridLines: false,
+		responsive: true,
+		scaleFontColor: "#a9aebd",
+		scaleLineColor: "#a9aebd",
+		scaleShowGridLines: false
 	});
 
 }
@@ -107,11 +111,13 @@ function renderStatCards(data) {
 }
 
 function makeGraphs(error, topicsData, statsData) {
-	// Chart.defaults.global.responsive = true;
-	// Chart.defaults.global.maintainAspectRatio = false;
-	Chart.defaults.global.scaleLineColor = "#a9aebd";
-	Chart.defaults.global.scaleFontColor = "#a9aebd";
 
-	renderTopicsChart(topicsData);
-	renderStatCards(statsData);
+	if (!error) {
+		// Set chart global defaults
+		Chart.defaults.global.scaleFontFamily = "'Roboto', sans-serif";
+
+		renderTopicsChart(topicsData);
+		renderStatCards(statsData);
+	}
+
 };
