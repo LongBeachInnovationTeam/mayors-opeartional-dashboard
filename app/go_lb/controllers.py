@@ -26,8 +26,28 @@ def index():
     ORDER BY    topic_count DESC
     LIMIT 10;
   """
-  result = db.sql_to_dict(sql)
-  return render_template('go_lb/index.html', multiple_locations=result)
+  duplicate_locations = db.sql_to_dict(sql)
+
+  sql = """
+    SELECT    department
+              ,ROUND(AVG(date_closed - entered_date)::numeric, 2) AS avg_days_to_close
+    FROM      go_long_beach
+    WHERE     date_closed - entered_date IS NOT NULL AND entered_date BETWEEN '2015-10-01' AND '2015-10-31'
+    GROUP BY  department
+    ORDER BY  avg_days_to_close DESC;
+  """
+  department_averages = db.sql_to_dict(sql)
+
+  result = {
+    'duplicate_locations': duplicate_locations,
+    'department_averages': department_averages
+  }
+
+  return render_template('go_lb/index.html', table_data=result)
+
+@go_lb.route('/go_lb/drilldown')
+def go_lb_drilldown():
+  return render_template('go_lb/drilldown.html')
 
 @go_lb.route('/data/go_lb/last_updated')
 def go_lb_last_updated():
@@ -158,17 +178,6 @@ def go_lb_measures():
 
   return json.dumps(result, default=date_handler)
 
-@go_lb.route('/data/go_lb/departments')
-def go_lb_departments():
-  sql = """
-    SELECT 		department, COUNT(request) AS count
-    FROM 			go_long_beach
-    WHERE			entered_date BETWEEN '2015-10-01' AND '2015-10-31'
-    GROUP BY	department
-    ORDER BY	count DESC;
-  """
-  return db.sql_to_json(sql)
-
 @go_lb.route('/data/go_lb/map')
 def go_lb_map():
   sql = """
@@ -180,16 +189,3 @@ def go_lb_map():
     FROM 		go_long_beach;
   """
   return db.sql_to_json(sql)
-
-@go_lb.route('/data/go_lb/repeat_requests')
-def go_lb_repeat_requests():
-  sql = """
-    SELECT      location
-                ,topic
-                ,COUNT(topic) as topic_count
-    FROM        go_long_beach
-    WHERE       (entered_date BETWEEN '2015-10-01' AND '2015-10-31')
-    GROUP BY    location, topic
-    ORDER BY    topic_count DESC;
-  """
-  return db.sql_to_dict(sql)

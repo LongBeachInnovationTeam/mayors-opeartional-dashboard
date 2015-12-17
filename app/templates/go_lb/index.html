@@ -21,7 +21,7 @@
 
 <div class="row statcards">
   <div class="col-sm-6 col-md-3 m-b">
-    <div class="statcard">
+    <div class="statcard" tabindex="0">
       <div class="p-a">
         <span class="statcard-desc">Open Requests</span>
         <h2 class="statcard-number">
@@ -87,18 +87,17 @@
       <canvas id="go-lb-topics"></canvas>
     </div>
     <div class="col-md-6">
-      <div class="list-group">
-
+      <div id="department-average-table" class="list-group">
         <h4 class="list-group-header">
-          Request distribution by department
+          Average time to close requests by department
         </h4>
-
-        <a class="list-group-item" href="#">
-          <span class="list-group-progress" style="width: 62.4%;"></span>
-          <span class="pull-right text-muted">62.4%</span>
-          Public Works
-        </a>
-
+        {% for d in table_data.department_averages %}
+          <a class="list-group-item" href="go_lb/drilldown">
+            <span class="list-group-progress" style="width:{{ d.avg_days_to_close }}%;"></span>
+            <span class="pull-right text-muted">{{ d.avg_days_to_close }} days</span>
+            {{ d.department }}
+          </a>
+        {% endfor %}
       </div>
     </div>
   </div>
@@ -106,34 +105,46 @@
     <div class="col-md-6">
       <h4>GO Long Beach Requests &mdash; Intensity Map</h4>
       <div id="go-lb-map-canvas"></div>
-      <p>
-        <br />
+      <br />
+      <div class="well well-sm">
         Displaying <strong>Graffiti</strong> and
         <strong>Illegally dumped item</strong> requests that took over
         <strong>10 DAYS</strong> to resolve within the past 6 months.
-      </p>
-    </div>
-    <div class="col-md-6">
-      <h4>Duplicate Requests By Location and Topic</h4>
-      <table id="duplicate-requests-table" class="table table-condensed">
-        <thead>
-          <tr>
-            <th>Location</th>
-            <th>Topic</th>
-            <th>Requests</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for l in multiple_locations %}
+      </div>
+      <!--<div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">GO Long Beach Requests &mdash; Intensity Map</div>
+        </div>
+        <div class="panel-body">
+          <div id="go-lb-map-canvas"></div>
+          <div class="well well-sm">
+            Displaying <strong>Graffiti</strong> and
+            <strong>Illegally dumped item</strong> requests that took over
+            <strong>10 DAYS</strong> to resolve within the past 6 months.
+          </div>
+        </div>-->
+      </div>
+      <div class="col-md-6">
+        <h4>Duplicate Requests By Location and Topic</h4>
+        <table id="duplicate-requests-table" class="table table-condensed">
+          <thead>
             <tr>
-              <td>{{ l.location }}</td>
-              <td>{{ l.topic }}</td>
-              <td>{{ l.topic_count }}</td>
+              <th>Location</th>
+              <th>Topic</th>
+              <th>Requests</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {% for t in table_data.duplicate_locations %}
+              <tr>
+                <td>{{ t.location }}</td>
+                <td>{{ t.topic }}</td>
+                <td>{{ t.topic_count }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="requests">

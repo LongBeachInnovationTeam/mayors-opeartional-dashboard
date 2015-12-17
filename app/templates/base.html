@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CLB Dashboard</title>
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
-    <link rel="stylesheet" href="./static/bootstrap-dashboard/toolkit-inverse.min.css">
+    <link rel="stylesheet" href="./static/lib/bootstrap-dashboard/toolkit-inverse.min.css">
     <link rel="stylesheet" href="./static/css/application.css">
     <link rel="stylesheet" href="./static/css/chart_styles.css">
     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
@@ -38,7 +38,7 @@
               <a href="#">Social Media</a>
             </li>
             <li>
-              <a href="#">CLB Website</a>
+              <a href="#">Website Analytics</a>
             </li>
             <li>
               <a href="#">Economic Development</a>
@@ -52,7 +52,6 @@
       {% block content %}{% endblock %}
     </div><!--.container-->
 
-    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
     <script>
       // get the viz.json url from the CartoDB Editor
       // - click on visualize
@@ -60,18 +59,19 @@
       // - make visualization public
       // - click on publish
       // - go to API tab
-      window.onload = function () {
-        cartodb.createVis('go-lb-map-canvas', 'https://alchave.cartodb.com/api/v2/viz/226e9248-8780-11e5-bc45-0ea31932ec1d/viz.json');
-      }
+      // window.onload = function () {
+      //   cartodb.createVis('go-lb-map-canvas', 'https://alchave.cartodb.com/api/v2/viz/226e9248-8780-11e5-bc45-0ea31932ec1d/viz.json');
+      // }
     </script>
 
     <script src="./static/lib/js/jquery.min.js"></script>
     <script src="./static/lib/js/Chart.min.js"></script>
-    <script src="./static/bootstrap-dashboard/toolkit.min.js"></script>
+    <script src="./static/lib/bootstrap-dashboard/toolkit.min.js"></script>
     <script src="./static/lib/js/underscore-min.js"></script>
     <script src="./static/lib/js/Chart.HorizontalBar.js"></script>
     <script src="./static/lib/js/d3.js"></script>
     <script src="./static/lib/js/queue.js"></script>
     <script src="./static/js/graphs.js"></script>
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
   </body>
 </html>

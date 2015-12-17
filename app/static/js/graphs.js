@@ -3,6 +3,13 @@ queue()
   .defer(d3.json, "data/go_lb/measures")
   .await(makeGraphs);
 
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+  var target = $(e.target).attr("href");
+  if ((target == '#locations')) {
+		renderRequestsMap();
+  }
+});
+
 function getMonthName(d) {
 	var monthNames = ["January", "February", "March", "April", "May", "June",
   	"July", "August", "September", "October", "November", "December"
@@ -11,18 +18,23 @@ function getMonthName(d) {
 	return monthNames[d.getMonth()];
 }
 
+function renderRequestsMap() {
+	// Select the div which holds our map content
+	var mapCanvas = $('#go-lb-map-canvas');
+
+	// Make sure the map canvas isn't already rendered
+	// i.e. see if there is content inside the div
+	if (mapCanvas.html().length == 0)
+	{
+		cartodb.createVis('go-lb-map-canvas', 'https://alchave.cartodb.com/api/v2/viz/226e9248-8780-11e5-bc45-0ea31932ec1d/viz.json');
+	}
+}
+
 function renderTopicsChart(data) {
 
 	// Pluck values
 	var topics = _.pluck(data, 'topic');
 	var topicCountValues = _.pluck(data, 'count');
-
-	// Convert counts into percentages
-	// var total = _.reduce(topicCountValues, function(memo, num) { return memo + num; }, 0);
-	// var topicPercentageValues = [];
-	// topicCountValues.forEach(function(t) {
-	// 	topicPercentageValues.push((t / total) * 100);
-	// });
 
 	// Prepare chart data format
 	var chartData = {
@@ -63,14 +75,30 @@ function renderStatCardSparkline(elemId, measure, labelName, valueName, data) {
   var sparklineOptions = {
     animation: false,
     responsive: true,
-    bezierCurve : true,
-    bezierCurveTension : 0.25,
+    bezierCurve: true,
+    bezierCurveTension: 0.25,
     showScale: false,
     pointDotRadius: 0,
     pointDotStrokeWidth: 0,
     pointDot: false,
+    scaleFontColor: "#a9aebd",
+    scaleShowGridLines: false,
+    scaleShowLabels: false,
     showTooltips: false
   };
+
+  // Get month value name for the first and last
+  // label names only. Put blank strings for
+  // all the other labels.
+  // var labels = _.pluck(data[measure], labelName);
+  // labels.forEach(function (l, i) {
+  // 	if (i == 0 || i == labels.length - 1) {
+  // 		labels[i] = getMonthName(l);
+  // 	}
+  // 	else {
+  // 		labels[i] = "";
+  // 	}
+  // });
 
   // Prepare chart data
   var chartData = {
@@ -110,7 +138,7 @@ function renderStatCards(data) {
 
 }
 
-function makeGraphs(error, topicsData, statsData) {
+function makeGraphs(error, topicsData, statsData, departmentData) {
 
 	if (!error) {
 		// Set chart global defaults
