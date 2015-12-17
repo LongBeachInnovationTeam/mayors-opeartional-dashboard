@@ -1,12 +1,18 @@
 queue()
   .defer(d3.json, "data/go_lb/topics")
   .defer(d3.json, "data/go_lb/measures")
+  //.defer(d3.json, "data/go_lb/departments")
   .await(makeGraphs);
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
   var target = $(e.target).attr("href");
-  if ((target == '#locations')) {
+  if (target == '#locations') {
 		renderRequestsMap();
+  }
+  if (target == '#departments') {
+  	$.getJSON('data/go_lb/departments', function (data) {
+  		renderDepartmentAverageChart(data);
+		});
   }
 });
 
@@ -30,7 +36,7 @@ function renderRequestsMap() {
 	}
 }
 
-function renderTopicsChart(data) {
+function renderTopicsCountChart(data) {
 
 	// Pluck values
 	var topics = _.pluck(data, 'topic');
@@ -52,12 +58,47 @@ function renderTopicsChart(data) {
 	}
 
 	// Render chart
-	var ctx = document.getElementById("go-lb-topics").getContext("2d");
+	var ctx = document.getElementById("go-lb-topic-count").getContext("2d");
 	var chart = new Chart(ctx).HorizontalBar(chartData, {
 		animation: false,
 		barValueSpacing : 1,
 		responsive: true,
 		scaleFontColor: "#a9aebd",
+		scaleLineColor: "#a9aebd",
+		scaleShowGridLines: false
+	});
+
+}
+
+function renderTopicsAverageChart(data) {
+
+	// Pluck values
+	var labels = _.pluck(data, 'topic');
+	var values = _.pluck(data, 'avg_days_to_close');
+
+	// Prepare chart data format
+	var chartData = {
+    labels: labels,
+    datasets: [
+      {
+        label: "Topic Average",
+        fillColor: "#630CE8",
+        strokeColor: "rgba(99,12,232,0.8)",
+        highlightFill: "rgba(99,12,232,0.5)",
+        highlightStroke: "rgba(99,12,232,1)",
+        data: values
+      }
+    ]
+	}
+
+	// Render chart
+	var ctx = document.getElementById("go-lb-topic-average").getContext("2d");
+	var chart = new Chart(ctx).HorizontalBar(chartData, {
+		animation: false,
+		barValueSpacing : 1,
+		responsive: true,
+		scaleFontColor: "#a9aebd",
+		scaleLabel: "<%=value%> days",
 		scaleLineColor: "#a9aebd",
 		scaleShowGridLines: false
 	});
@@ -138,14 +179,51 @@ function renderStatCards(data) {
 
 }
 
-function makeGraphs(error, topicsData, statsData, departmentData) {
+function renderDepartmentAverageChart(data) {
+
+	// Pluck values
+	var labels = _.pluck(data, 'department');
+	var values = _.pluck(data, 'count');
+
+	// Prepare chart data format
+	var chartData = {
+    labels: labels,
+    datasets: [
+      {
+        label: "Department Count",
+        fillColor: "#1ca8dd",
+        strokeColor: "rgba(28,168,221,0.8)",
+        highlightFill: "rgba(28,168,221,0.5)",
+        highlightStroke: "rgba(28,168,221,1)",
+        data: values
+      }
+    ]
+	}
+
+	// Render chart
+	var ctx = document.getElementById("department-count-chart").getContext("2d");
+	var chart = new Chart(ctx).Bar(chartData, {
+		animation: false,
+		barValueSpacing : 1,
+		responsive: true,
+		scaleFontColor: "#a9aebd",
+		scaleLineColor: "#a9aebd",
+		scaleShowGridLines: false
+	});
+
+}
+
+
+function makeGraphs(error, topicsData, statsData) {
 
 	if (!error) {
 		// Set chart global defaults
 		Chart.defaults.global.scaleFontFamily = "'Roboto', sans-serif";
 
-		renderTopicsChart(topicsData);
+		renderTopicsCountChart(topicsData.topics_count);
+		renderTopicsAverageChart(topicsData.topics_average)
 		renderStatCards(statsData);
+		//renderDepartmentAverageChart(departmentData);
 	}
 
 };

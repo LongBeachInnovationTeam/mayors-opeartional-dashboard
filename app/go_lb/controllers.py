@@ -67,7 +67,37 @@ def go_lb_topics():
     GROUP BY  topic
     ORDER BY  count ASC;
   """
-  return db.sql_to_json(sql)
+  topics_count = db.sql_to_dict(sql)
+
+  sql = """
+    SELECT    topic
+              ,ROUND(AVG(date_closed - entered_date)::numeric, 2) AS avg_days_to_close
+    FROM      go_long_beach
+    WHERE     entered_date BETWEEN '2015-10-01' AND '2015-10-31'
+    GROUP BY  topic
+    ORDER BY  avg_days_to_close;
+  """
+  topics_average = db.sql_to_dict(sql)
+
+  results = {
+    "topics_count": topics_count,
+    "topics_average": topics_average
+  }
+
+  return json.dumps(results, default=date_handler)
+
+@go_lb.route('/data/go_lb/departments')
+def go_lb_departments():
+  sql = """
+    SELECT    department
+              ,COUNT(request) AS count
+    FROM      go_long_beach
+    WHERE     entered_date BETWEEN '2015-10-01' AND '2015-10-31'
+    GROUP BY  department
+    ORDER BY  count DESC;
+  """
+  result = db.sql_to_dict(sql)
+  return json.dumps(result)
 
 @go_lb.route('/data/go_lb/measures')
 def go_lb_measures():
