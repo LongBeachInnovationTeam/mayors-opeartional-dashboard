@@ -23,3 +23,29 @@
   background-color: #0A324C;
   border: 1px solid #ddd;
 }
+
+#department-scatter-wrapper .name {
+  float: right;
+  color: #27aae1;
+}
+#department-scatter-wrapper .axis {
+  fill: none;
+  stroke: #a9aebd;
+  stroke-width: 1px;
+}
+#department-scatter-wrapper text {
+  stroke: none;
+  fill: #a9aebd;
+  font-size: .7em;
+  font-family: "Roboto", sans-serif;
+}
+#department-scatter-wrapper .label {
+  fill: #414241;
+}
+#department-scatter-wrapper .node {
+  cursor:pointer;
+}
+#department-scatter-wrapper .dot {
+  /*  opacity: .7;*/
+  cursor: pointer;
+}

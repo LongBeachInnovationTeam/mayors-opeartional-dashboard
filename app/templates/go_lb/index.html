@@ -11,6 +11,7 @@
       <button type="button" class="btn btn-primary-outline disabled">Day</button>
       <button type="button" class="btn btn-primary-outline disabled">Week</button>
       <button type="button" class="btn btn-primary-outline active">Month</button>
+      <button type="button" class="btn btn-primary-outline disabled">YTD</button>
     </div>
   </div>
 </div>
@@ -86,7 +87,7 @@
 
     <div role="tabpanel" class="tab-pane active" id="topics">
       <div class="col-md-6">
-        <h4>Reported topic distribution for this month</h4>
+        <h4>Reported topic distribution</h4>
         <canvas id="go-lb-topic-count"></canvas>
       </div>
       <div class="col-md-6">
@@ -96,23 +97,44 @@
     </div>
 
     <div role="tabpanel" class="tab-pane" id="departments">
-      <div class="col-md-6">
-        <h4>Topic department distribution by month</h4>
+      <div class="col-md-12">
+        <h4>Number of department requests vs. avergage days to close</h4>
+        <div id="department-scatter-wrapper" class="clickable-area" tabindex=0>
+          <div id="department-scatter"></div>
+        </div>
+        <!--<h4>Topic department distribution by month</h4>
         <canvas id="department-count-chart"></canvas>
+        -->
+        <!--
+        <div id="department-count-table" class="list-group">
+          <h4 class="list-group-header">
+            Topic department distribution by month
+          </h4>
+          {% for d in table_data.department_count %}
+            <a class="list-group-item" href="#">
+              <span class="list-group-progress" style="width:{{ d.normalized_count * 100 }}%;"></span>
+              <span class="pull-right text-muted">{{ d.count }} requests</span>
+              {{ d.department }}
+            </a>
+          {% endfor %}
+        </div>
+        -->
       </div>
       <div class="col-md-6">
+        <!--
         <div id="department-average-table" class="list-group">
           <h4 class="list-group-header">
             Average time to close requests by department
           </h4>
           {% for d in table_data.department_averages %}
             <a class="list-group-item" href="go_lb/drilldown">
-              <span class="list-group-progress" style="width:{{ d.avg_days_to_close }}%;"></span>
+              <span class="list-group-progress" style="width:{{ d.normalized_avg * 100 }}%;"></span>
               <span class="pull-right text-muted">{{ d.avg_days_to_close }} days</span>
               {{ d.department }}
             </a>
           {% endfor %}
         </div>
+        -->
       </div>
     </div>
 

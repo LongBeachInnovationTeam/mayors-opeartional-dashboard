@@ -6,8 +6,8 @@ import collections
 
 social = Blueprint('social', __name__)
 
-FB_ACCESS_TOKEN = 'CAACEdEose0cBAC4JxAf9Dy4ZAZBRNTElkwaiPakxaZAN78EeYKJZBR7AkLV6T8lNv2N2JzeFRq7sEhEKGfGxGGNvFfmjTQIcmJ7yy4lCznA929Gb9sMWLaWRAVVEqqxHAX2JZAsWSjbYMpT4ZCBUQKpTVtxGQhpyUMlZAay3r3mSNZBiaUFYjC38ZCOSYz4TqvpBIh2ZAknUZBY4fvLybJQYRLZC'
-FB_DATA_URL = 'https://graph.facebook.com/v2.5/iteamlb?fields=insights,posts%7Bid%2Cmessage%2Ctype%2Cinsights%7D&access_token=' + FB_ACCESS_TOKEN
+FB_ACCESS_TOKEN = 'CAACEdEose0cBAMZB23nc3yrzRzyukmXruZAQfLroMlKcVXL97vC4rDkBXFkfhWDjsRPGTzZCOf6dUJUgEd62cukjvFbJMCQtUButhRZAvEFCdzNpgf3S8ef79HHTnixIKRWN4FdFo21qWhZCniyPmhyBXGwM5Hkg5C2a5K6VNSn4arkgtnYBYyUciCZAUY6NsZD'
+FB_DATA_URL = 'https://graph.facebook.com/v2.5/LBMayorsOffice?fields=insights,posts%7Bid%2Cmessage%2Ctype%2Cinsights%7D&access_token=' + FB_ACCESS_TOKEN
 
 def get_page_stats(insights_data):
 	page_stats = {}
