@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
 from app.database.model import Database
 from app.util.util import Util
+from collections import Counter
 import collections, datetime, json
 
 db = Database()
@@ -107,6 +108,27 @@ def go_lb_last_updated():
   """
   last_updated = db.sql_to_value(sql)
   return json.dumps(last_updated, default=util.date_handler)
+
+def clean_description(desc):
+  desc = desc.lower()
+  desc = desc.strip()
+  return desc
+
+def count_words(desc):
+  desc = clean_description(desc)
+  return dict(Counter(desc.split()))
+
+@go_lb.route('/data/go_lb/word_cloud')
+def go_lb_word_cloud():
+  sql = """
+    SELECT  string_agg(description, ' ') AS description_text
+    FROM    go_long_beach
+    WHERE   entered_date BETWEEN %s AND %s;
+  """
+  params = (reporting_dates['cur_month_start'], reporting_dates['cur_month_end'])
+  description = db.sql_to_value(sql, params)
+  word_count_dict = count_words(description[0])
+  return json.dumps(word_count_dict, util.date_handler)
 
 @go_lb.route('/data/go_lb/topics')
 def go_lb_topics():
