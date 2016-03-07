@@ -9,29 +9,6 @@ util = Util()
 
 go_lb = Blueprint('go_lb', __name__)
 
-today = datetime.date.today()
-reporting_dates = {
-  'today': today.isoformat(),
-  'yesterday': today.replace(day = today.day - 1).isoformat(),
-  'tomorrow': today.replace(day = today.day + 1).isoformat(),
-  'cur_year_start': str(today.year) + '-01-01',
-  'cur_year_end': str(today.year) + '-12-31',
-  'cur_month_start': util.get_month_day_range(today)[0].isoformat(),
-  'cur_month_end': util.get_month_day_range(today)[1].isoformat(),
-  'cur_week_start': util.get_week_day_range(today)[0].isoformat(),
-  'cur_week_end': util.get_week_day_range(today)[6].isoformat()
-}
-
-def get_reporting_period_interval(date_reporting_type):
-  if date_reporting_type == 'ytd':
-    return (reporting_dates['cur_year_start'], reporting_dates['cur_year_end'])
-  elif date_reporting_type == 'month':
-    return (reporting_dates['cur_month_start'], reporting_dates['cur_month_end'])
-  elif date_reporting_type == 'week':
-    return (reporting_dates['cur_week_start'], reporting_dates['cur_week_end'])
-  else:
-    return (reporting_dates['today'], reporting_dates['today'])
-
 @go_lb.route('/')
 def index():
   sql = """
@@ -125,7 +102,7 @@ def go_lb_word_cloud():
     FROM    go_long_beach
     WHERE   entered_date BETWEEN %s AND %s;
   """
-  params = (reporting_dates['cur_month_start'], reporting_dates['cur_month_end'])
+  params = util.reporting_calendar.get_reporting_period_interval('month')
   description = db.sql_to_value(sql, params)
   word_count_dict = count_words(description)
   return json.dumps(word_count_dict, util.date_handler)
@@ -139,7 +116,7 @@ def go_lb_topics():
     GROUP BY  topic
     ORDER BY  count ASC;
   """
-  params = (reporting_dates['cur_month_start'], reporting_dates['cur_month_end'])
+  params = util.reporting_calendar.get_reporting_period_interval('month')
   topics_count = db.sql_to_dict(sql, params)
 
   sql = """
@@ -150,7 +127,7 @@ def go_lb_topics():
     GROUP BY  topic
     ORDER BY  avg_days_to_close;
   """
-  params = (reporting_dates['cur_month_start'], reporting_dates['cur_month_end'])
+  params = util.reporting_calendar.get_reporting_period_interval('month')
   topics_average = db.sql_to_dict(sql, params)
 
   results = {
@@ -171,7 +148,7 @@ def go_lb_departments():
     GROUP BY  department
     ORDER BY  avg_days_to_close DESC;
   """
-  params = (reporting_dates['cur_month_start'], reporting_dates['cur_month_end'])
+  params = util.reporting_calendar.get_reporting_period_interval('month')
   result = db.sql_to_dict(sql, params)
 
   department_rename_mapper = {
@@ -193,7 +170,7 @@ def go_lb_departments():
 def go_lb_measures():
 
   # TO-DO: Get params by selected date button
-  params = (reporting_dates['cur_month_start'], reporting_dates['cur_month_end'])
+  params = util.reporting_calendar.get_reporting_period_interval('month')
 
   # Compute the total number of requests
   sql = """
