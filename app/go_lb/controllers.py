@@ -127,7 +127,7 @@ def go_lb_word_cloud():
   """
   params = (reporting_dates['cur_month_start'], reporting_dates['cur_month_end'])
   description = db.sql_to_value(sql, params)
-  word_count_dict = count_words(description[0])
+  word_count_dict = count_words(description)
   return json.dumps(word_count_dict, util.date_handler)
 
 @go_lb.route('/data/go_lb/topics')

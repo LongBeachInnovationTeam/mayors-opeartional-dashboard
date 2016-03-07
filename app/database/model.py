@@ -65,4 +65,4 @@ class Database:
     finally:
       if connection:
         connection.close()
-      return scalar_result
+      return scalar_result[0]

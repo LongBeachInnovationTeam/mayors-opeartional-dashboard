@@ -122,7 +122,7 @@ function renderTopicsAverageChart(data) {
 }
 
 function renderStatCardValue(elemId, measure, data) {
-	var t = data[measure][0].toLocaleString();
+	var t = data[measure].toLocaleString();
 	$(elemId).text(t);
 }
 
