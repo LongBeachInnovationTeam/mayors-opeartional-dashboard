@@ -3,8 +3,11 @@ import datetime, calendar
 class ReportingCalendar:
 
 	def __init__(self):
+		self.reporting_dates = self.get_reporting_dates()
+
+	def get_reporting_dates(self):
 		today = datetime.date.today()
-		self.reporting_dates = {
+		return {
 		  'today': today.isoformat(),
 		  'yesterday': today.replace(day = today.day - 1).isoformat(),
 		  'tomorrow': today.replace(day = today.day + 1).isoformat(),
